@@ -1,0 +1,9 @@
+{
+    "extends" : "aribnb-base",
+    "env" :{
+        "browser" : "true"
+    },
+    "rules": {
+        "no-console": "off"
+      } 
+}
