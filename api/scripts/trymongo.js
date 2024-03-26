@@ -1,4 +1,5 @@
 
+require('dotenv').config();
 
 const { MongoClient } = require('mongodb');
 
@@ -54,6 +55,7 @@ async function testWithAsync() {
     const employee = { id: 2, name: 'B. Async', age: 16};
     const result = await collection.insertOne(employee);
     console.log('Result of insert:\n', result.insertedId);
+    
     const docs = await collection.find( { _id: result.insertedId }).toArray();
     console.log('Result of find:\n', docs);
   }
