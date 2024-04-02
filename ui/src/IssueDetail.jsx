@@ -1,9 +1,10 @@
+
 import React from 'react';
 
 import graphQLFetch from './graphQLFetch.js';
 
 export default class IssueDetail extends React.Component {
-  constructor() {
+  constructor () {
     super();
     this.state = { issue: {} };
   }
@@ -31,7 +32,8 @@ export default class IssueDetail extends React.Component {
     const data = await graphQLFetch(query, { id });
     if (data) {
       this.setState({ issue: data.issue });
-    } else {
+    }
+    else {
       this.setState({ issue: {} });
     }
   }

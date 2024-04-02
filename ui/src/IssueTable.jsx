@@ -1,9 +1,17 @@
+
 import React from 'react';
 import { Link, NavLink, withRouter } from 'react-router-dom';
 
-const IssueRow = withRouter(({ issue, location: { search } }) => {
+
+const IssueRow = withRouter(({
+  issue,
+  location: { search },
+  closeIssue,
+  deleteIssue,
+  index,
+}) => {
   const selectLocation = { pathname: `/issues/${issue.id}`, search };
-  console.log('SelectLocation = ' + JSON.stringify(selectLocation));
+console.log('SelectLocation = ' + JSON.stringify(selectLocation));
   return (
     <tr>
       <td>{issue.id}</td>
@@ -11,21 +19,36 @@ const IssueRow = withRouter(({ issue, location: { search } }) => {
       <td>{issue.owner}</td>
       <td>{issue.created.toDateString()}</td>
       <td>{issue.effort}</td>
-      <td>{issue.due ? issue.due.toDateString() : ''}</td>
+      <td>{issue.due ? issue.due.toDateString() : ' '}</td>
       <td>{issue.title}</td>
       <td>
         <Link to={`/edit/${issue.id}`}>Edit</Link>
         {' | '}
         <NavLink to={selectLocation}>Select</NavLink>
+        {' | '}
+        <button type="button" onClick={() => { closeIssue(index); }}>
+          Close
+        </button>
+        {' | '}
+        <button type="button" onClick={() => { deleteIssue(index); }}>
+          Delete
+        </button>
       </td>
+
     </tr>
   );
 });
 
-export default function IssueTable({ issues }) {
-  const issueRows = issues.map(issue => (
-    <IssueRow key={issue.id} issue={issue} />
-  ));
+export default function IssueTable({ issues, closeIssue, deleteIssue }) {
+  const issueRows = issues.map((issue, index) =>
+    <IssueRow
+      key={issue.id}
+      issue={issue}
+      closeIssue={closeIssue}
+      deleteIssue={deleteIssue}
+      index={index}
+    />
+  );
 
   return (
     <table className="bordered-table">

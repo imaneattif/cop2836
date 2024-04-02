@@ -7,6 +7,7 @@ module.exports = {
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'public'),
+    publicPath: '/',
   },
   module: {
     rules: [
@@ -23,5 +24,5 @@ module.exports = {
       chunks: 'all',
     },
   },
-  devtool: 'source-map',
+  devtool: 'source-map'
 };

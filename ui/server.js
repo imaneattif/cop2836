@@ -1,7 +1,7 @@
+
 require('dotenv').config();
 
 const express = require('express');
-
 
 const app = express();
 
@@ -16,7 +16,7 @@ const path = require('path');
 const port = process.env.UI_SERVER_PORT || 8000;
 
 if (enableHMR && (process.env.NODE_ENV !== 'production')) {
-  console.log('Adding dev middlware, enabling HMR');
+  console.log('Adding dev middleware, enabling HMR');
   /* eslint "global-require": "off" */
   /* eslint "import/no-extraneous-dependencies": "off" */
   const webpack = require('webpack');
@@ -36,7 +36,7 @@ if (enableHMR && (process.env.NODE_ENV !== 'production')) {
 app.use(express.static('public'));
 
 app.get('/env.js', (req, res) => {
-  res.send(`window.ENV = ${JSON.stringify(env)}`);
+  res.send(`window.ENV = ${JSON.stringify(env)}`)
 });
 
 app.get('*', (req, res) => {
@@ -45,16 +45,5 @@ app.get('*', (req, res) => {
 
 app.listen(port, () => {
   console.log(`UI started on port ${port}`);
-});
-
-
-const apiProxyTarget = process.env.API_PROXY_TARGET;
-if (apiProxyTarget) {
-  app.use('/graphql', proxy({ target: apiProxyTarget }));
-}
-
-
-
-
-
+})
 

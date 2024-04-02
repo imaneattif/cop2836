@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
@@ -12,7 +13,7 @@ function NavBar() {
       {' | '}
       <NavLink to="/report">Report</NavLink>
     </nav>
-  );
+  )
 }
 
 export default function Page() {
