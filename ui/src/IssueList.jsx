@@ -2,20 +2,28 @@
 import React from 'react';
 import IssueFilter from './IssueFilter.jsx';
 import IssueTable from './IssueTable.jsx';
-import IssueAdd from './IssueAdd.jsx';
 import graphQLFetch from './graphQLFetch.js';
 import URLSearchParams from 'url-search-params';
 import { Route } from 'react-router-dom';
 import IssueDetail from './IssueDetail.jsx';
+import { Panel } from 'react-bootstrap';
+import Toast from './Toast.jsx';
+
 
 export default class IssueList extends React.Component {
 
   constructor() {
     super();
-    this.state = { issues: [] };
-    this.createIssue = this.createIssue.bind(this);
+    this.state = { issues: [],
+      toastVisible: false,
+      toastMessage: '',
+      toastType: 'success',
+    };
     this.closeIssue = this.closeIssue.bind(this);
     this.deleteIssue = this.deleteIssue.bind(this);
+    this.showSuccess = this.showSuccess.bind(this);
+    this.showError = this.showError.bind(this);
+    this.dismissToast = this.dismissToast.bind(this);
   }
 
   async closeIssue(index) {
@@ -25,7 +33,7 @@ export default class IssueList extends React.Component {
       }
     }`;
     const { issues } = this.state;
-    const data = await graphQLFetch (query, { id: issues[index].id });
+    const data = await graphQLFetch (query, { id: issues[index].id }, this.showError);
     if (data) {
       this.setState((prevState) => {
         const newList = [...prevState.issues];
@@ -44,7 +52,7 @@ export default class IssueList extends React.Component {
     const { issues } = this.state;
     const { location: { pathname, search }, history } = this.props;
     const { id } = issues[index];
-    const data = await graphQLFetch (query, { id });
+    const data = await graphQLFetch (query, { id }, this.showError);
     if (data && data.issueDelete) {
       this.setState((prevState) => {
         const newList = [...prevState.issues];
@@ -54,21 +62,8 @@ export default class IssueList extends React.Component {
         newList.splice(index, 1);
         return { issues: newList };
       });
+      this.showSuccess(`Deleted issue ${id} successfully.`);
     } else {
-      this.loadData();
-    }
-  }
-
-  async createIssue(issue) {
-
-    const query = `mutation issueAdd($issue: IssueInputs!) {
-      issueAdd(issue: $issue) {
-        id
-      }
-    }`;
-
-    const data = await graphQLFetch(query, { issue });
-    if (data) {
       this.loadData();
     }
   }
@@ -83,6 +78,22 @@ export default class IssueList extends React.Component {
     if (prevSearch !== search) {
       this.loadData();
     }
+  }
+
+  showSuccess(message) {
+    this.setState({
+      toastVisible: true, toastMessage: message, toastType: 'success',
+    });
+  }
+
+  showError(message) {
+    this.setState({
+      toastVisible: true, toastMessage: message, toastType: 'danger',
+    });
+  }
+
+  dismissToast() {
+    this.setState({ toastVisible: false });
   }
 
   async loadData() {
@@ -111,7 +122,7 @@ export default class IssueList extends React.Component {
       }
     }`;
 
-    const data = await graphQLFetch(query, vars);
+    const data = await graphQLFetch(query, vars, this.showError);
     if (data) {
       this.setState({ issues: data.issueList });
     }
@@ -120,16 +131,22 @@ export default class IssueList extends React.Component {
   render() {
     const { issues } = this.state;
     const { match } = this.props;
+    const { toastVisible, toastMessage, toastType } = this.state;
     return (
       <React.Fragment>
-        <h1>Issue Tracker</h1>
-        <IssueFilter/>
-        <hr />
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title toggle>Filter</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body collapsible>
+            <IssueFilter />
+          </Panel.Body>
+        </Panel>
         <IssueTable issues={this.state.issues} closeIssue={this.closeIssue} deleteIssue={this.deleteIssue}/>
-        <hr />
-        <IssueAdd createIssue={this.createIssue}/>
-        <hr />
         <Route path={`${match.path}/:id`} component={IssueDetail} />
+        <Toast showing={toastVisible} onDismiss={this.dismissToast} bsStyle={toastType}>
+          {toastMessage}
+        </Toast>
       </React.Fragment>
     );
   }
